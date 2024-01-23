@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-const dist = path.join(__dirname, 'project-dist');
 const styleArr = [];
 
 async function writeStyles(readable) {
@@ -35,35 +34,6 @@ async function mergeStyle() {
   );
 }
 
-async function clearFile(dir) {
-  await fs.readdir(path.join(dir), async (err, files) => {
-    if (files === undefined) return;
-    await files.forEach((file) => {
-      fs.stat(path.join(dir, file), async (err, item) => {
-        const pathItem = path.join(dir, file);
-        if (item.isFile()) {
-          fs.unlink(path.join(pathItem), async (err) => {
-            if (err) console.log(err);
-          });
-        } else {
-          clearFile(pathItem);
-        }
-      });
-    });
-  });
-}
-
-async function clearAssets() {
-  await fs.readdir(path.join(dist, 'assets'), async (err, assets) => {
-    if (assets === undefined) return;
-    await assets.forEach((asset) => {
-      fs.rmdir(path.join(dist, 'assets', asset), (err) => {
-        if (err) console.log(err);
-      });
-    });
-  });
-}
-
 async function createDir() {
   await fs.mkdir(
     path.join(__dirname, 'project-dist'),
@@ -82,10 +52,10 @@ async function copyDir() {
       if (err) console.log(err);
     },
   );
-  await fs.readdir(path.join(__dirname, 'assets'), (err, files) => {
+  await fs.readdir(path.join(__dirname, 'assets'), async (err, files) => {
     if (err) console.log(err);
-    files.forEach((file) => {
-      fs.stat(path.join(__dirname, 'assets', file), (err, item) => {
+    await files.forEach((file) => {
+      fs.stat(path.join(__dirname, 'assets', file), async (err, item) => {
         if (err) console.log(err);
         if (item.isDirectory()) {
           fs.readdir(path.join(__dirname, 'assets', file), (err, data) => {
@@ -163,8 +133,6 @@ async function createIndexPage() {
 }
 
 async function build() {
-  await clearFile(dist);
-  await clearAssets();
   await createDir();
   await copyDir();
   await createIndexPage();
