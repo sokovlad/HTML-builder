@@ -10,5 +10,5 @@ rl.on('line', (text) => {
   writeStream.write(text + '\n');
 });
 rl.on('close', () => {
-  input.write('\nprogram is ended');
+  output.write('\nprogram is ended');
 });
